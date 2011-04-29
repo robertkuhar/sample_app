@@ -22,7 +22,10 @@ db/*.sqlite3
 .settings
 
 # jetbrains files
-.idea
+*.iml
+*.ipr
+*.iws
+.idea/
 
 .cache_rake_t
 
