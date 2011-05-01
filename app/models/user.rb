@@ -13,7 +13,9 @@
 require 'digest'
 
 class User < ActiveRecord::Base
+  # password is "virtual" attribute
   attr_accessor :password
+  # attr_accessible filters access to the model attributes
   attr_accessible :name, :email, :password, :password_confirmation
 
   EmailRegex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -34,6 +36,11 @@ class User < ActiveRecord::Base
   def has_password?(submitted_password)
     # Compare encrypted_password with the encrypted version of submitted password
     self.encrypted_password == encrypt(submitted_password)
+  end
+
+  def self.authenticate(email, password)
+    user = User.find_by_email(email)
+    return nil unless user && user.has_password?(password)
   end
 
   private

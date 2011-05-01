@@ -1,1 +1,5 @@
 <%= @user.name %>, <%= @user.email %>
+<h2>
+  <%= image_tag(gravatar_url(@user.email)) %>
+  <%= h(@user.name) %>
+</h2>
