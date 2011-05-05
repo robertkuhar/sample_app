@@ -16,7 +16,8 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    raise 'Not implemented'
+    sign_out
+    redirect_to root_path
   end
 
 end
