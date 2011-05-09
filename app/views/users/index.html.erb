@@ -1,0 +1,10 @@
+<h2>All users</h2>
+
+<ul class="users">
+  <% @users.each do |user| %>
+    <li>
+      <%= image_tag(gravatar_url(user.email, :size => 30)) %>
+      <%= link_to(h(user.name), user) %>
+    </li>
+  <% end %>
+</ul>
