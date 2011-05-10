@@ -54,6 +54,24 @@ describe UsersController do
         response.should have_tag("a[href=?]", "/users?page=2", "2")
         response.should have_tag("a[href=?]", "/users?page=2", "Next &raquo;")
       end
+
+      it "should show 'delete' for admins" do
+        admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(admin)
+        assert(admin.admin?)
+        get :index
+        response.should be_success
+        response.should have_tag("a[href=?]", "/users/1", "delete")
+      end
+
+      it "should not show 'delete' for non-admins" do
+        not_admin = Factory(:user, :email => "notadmin@example.com")
+        test_sign_in(not_admin)
+        assert(!not_admin.admin?)
+        get :index
+        response.should be_success
+        response.should_not have_tag("a[href=?]", "/users/1", "delete")
+      end
     end
   end
 
@@ -86,6 +104,12 @@ describe UsersController do
     it "should have a password confirmation field" do
       get :new
       response.should have_tag("input[name=?][type=?]", "user[password_confirmation]", "password")
+    end
+
+    it "should redirect if signed in" do
+      @user = test_sign_in(Factory(:user))
+      get :new
+      response.should redirect_to(root_path)
     end
   end
 
@@ -163,6 +187,17 @@ describe UsersController do
         post :create, :user => @attr
         controller.should be_signed_in
       end
+
+    end
+    it "should redirect if signed in" do
+      @user = test_sign_in(Factory(:user))
+      post :create,
+           :user => {
+                   :name => 'New User',
+                   :email => 'user@example.com',
+                   :password => 'foobar',
+                   :password_confirmation => 'foobar' }
+      response.should redirect_to(root_path)
     end
   end
 
@@ -292,15 +327,22 @@ describe UsersController do
 
     describe "as an admin uaer" do
       before(:each) do
-        admin = Factory(:user, :email => "admin@example.com", :admin => true)
-        test_sign_in(admin)
-        User.should_receive(:find).with(@user).and_return(@user)
-        @user.should_receive(:destroy).and_return(@user)
+        @admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(@admin)
       end
 
       it "should destroy the user" do
+        User.should_receive(:find).with(@user).and_return(@user)
+        @user.should_receive(:destroy).and_return(@user)
         delete :destroy, :id => @user
         response.should redirect_to(users_path)
+      end
+
+      it "should not destroy yourself" do
+        User.should_receive(:find).with(@admin).and_return(@admin)
+        delete :destroy, :id => @admin
+        response.should redirect_to(users_path)
+        flash[:error].should =~ /cannot destroy yourself/i        
       end
     end
   end
