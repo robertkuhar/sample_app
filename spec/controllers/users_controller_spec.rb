@@ -24,7 +24,7 @@ describe UsersController do
         third = Factory(:user, :email => "another@example.net")
         @users = [@user, second, third]
         30.times do
-          @users << Factory(:user, :email => Factory.next(:email))
+          @users << Factory(:user, :email => Factory.create(:email))
         end
         User.should_receive(:paginate).and_return(@users.paginate)
       end
