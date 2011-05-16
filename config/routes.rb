@@ -8,6 +8,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :sessions, :only => [:new, :create, :destroy]
   map.signin  '/signin',  :controller => 'sessions', :action => 'new'
   map.signout '/signout', :controller => 'sessions', :action => 'destroy'
+
+  map.resources :microposts, :only => [:create, :destroy]
   
   # The priority is based upon order of creation: first created -> highest priority.
 

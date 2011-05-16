@@ -50,6 +50,10 @@ class User < ActiveRecord::Base
     return user && user.has_password?(password) ? user : nil
   end
 
+  def feed
+    Micropost.all(:conditions => ["user_id = ?", id])
+  end
+
   private
   def encrypt_password
     unless password.nil?
